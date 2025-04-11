@@ -5,15 +5,17 @@ import socket
 
 app = Flask(__name__)
 videos = {
-    '1': 'video1.mp4',
-    '2': 'video2.mp4',
-    '3': 'video3.mp4',
-    '4': 'video4.mp4',
+    '1': 'data/video1.mp4',
+    '2': 'data/video2.mp4',
+    '3': 'data/video3.mp4',
+    '4': 'data/video4.mp4',
+    '5': 'data/video5.mp4',
 }
 overlays = {
     '1': '', '2': '', '3': '', '4': ''
 }
-glitch_videos = {'1': 'glitch.mp4', '2': 'glitch.mp4', '3': 'glitch.mp4', '4': 'glitch.mp4'}
+
+glitch_videos = {'1': 'data/glitch1.mp4', '2': 'data/glitch2.mp4', '3': 'data/glitch3.mp4', '4': 'data/glitch4.mp4', '5': 'data/glitch5.mp4'}
 glitches = {'1': False, '2': False, '3': False, '4': False}
 
 def generate(video_path, overlay_text, glitch_flag, glitch_video_path):
@@ -23,7 +25,8 @@ def generate(video_path, overlay_text, glitch_flag, glitch_video_path):
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
-            break
+            cap = cv2.VideoCapture(video_path)
+            # break
 
         # Resize and overlay glitch frame if active
         if glitch_flag and glitch_cap and glitch_cap.isOpened():
@@ -51,10 +54,10 @@ def generate(video_path, overlay_text, glitch_flag, glitch_video_path):
 @app.route('/video')
 def video_feed():
     n = request.args.get('n', '1')
-    video = videos.get(n, 'video1.mp4')
+    video = videos.get(n, 'data/video1.mp4')
     overlay = overlays.get(n, '')
     glitch = glitches.get(n, False)
-    glitch_video = glitch_videos.get(n, 'glitch.mp4')
+    glitch_video = glitch_videos.get(n, 'data/glitch1.mp4')
     return Response(generate(video, overlay, glitch, glitch_video),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
