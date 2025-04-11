@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Stream</title>
+</head>
+<body>
+  <h2>Stream 1</h2>
+  <form id="streamForm">
+    <label for="streamNumber">Enter Stream Number:</label>
+    <input type="number" id="streamNumber" name="streamNumber" min="1" required>
+    <button type="submit">Load Stream</button>
+  </form>
+  <img id="streamImage" src="" width="640" style="display:none;">
+  <script>
+    document.getElementById('streamForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const n = document.getElementById('streamNumber').value;
+      const img = document.getElementById('streamImage');
+      img.src = `http://localhost:5000/video?n=${n}`;
+      img.style.display = 'block';
+    });
+  </script>
+</body>
+</html>
