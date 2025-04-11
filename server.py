@@ -25,8 +25,9 @@ def generate(video_path, overlay_text, glitch_flag, glitch_video_path):
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
-            cap = cv2.VideoCapture(video_path)
-            # break
+            cap.set(cv2.CAP_PROP_POS_FRAMES, 0)  # loop the video
+            ret, frame = cap.read()
+            continue
 
         # Resize and overlay glitch frame if active
         if glitch_flag and glitch_cap and glitch_cap.isOpened():
@@ -43,7 +44,9 @@ def generate(video_path, overlay_text, glitch_flag, glitch_video_path):
         if overlay_text:
             cv2.putText(frame, overlay_text, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
 
-        _, buffer = cv2.imencode('.jpg', frame)
+        # _, buffer = cv2.imencode('.jpg', frame)
+        _, buffer = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 60])
+
         frame = buffer.tobytes()
         yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
