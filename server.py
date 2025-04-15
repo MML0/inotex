@@ -33,8 +33,7 @@ def generate(video_path, overlay_text, glitch_flag, glitch_video_path):
         if glitch_flag and glitch_cap and glitch_cap.isOpened():
             ret_glitch, glitch_frame = glitch_cap.read()
             if not ret_glitch:
-                glitch_cap.set(cv2.CAP_PROP_POS_FRAMES, 0)  # loop
-                ret_glitch, glitch_frame = glitch_cap.read()
+                glitch_flag = False  # reset glitch flag
 
             glitch_frame = cv2.resize(glitch_frame, (frame.shape[1], frame.shape[0]))
             alpha = 0.5  # blending strength
@@ -45,7 +44,7 @@ def generate(video_path, overlay_text, glitch_flag, glitch_video_path):
             cv2.putText(frame, overlay_text, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
 
         # _, buffer = cv2.imencode('.jpg', frame)
-        _, buffer = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 60])
+        _, buffer = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 50])
 
         frame = buffer.tobytes()
         yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')

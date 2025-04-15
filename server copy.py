@@ -44,7 +44,7 @@ class VideoStreamThread(threading.Thread):
 
         while self.running:
             if not cap.isOpened():
-                time.sleep(0.1)
+                time.sleep(0.01)
                 cap = cv2.VideoCapture(videos[self.stream_id])
                 continue
 
@@ -59,7 +59,9 @@ class VideoStreamThread(threading.Thread):
 
                 ret_glitch, glitch_frame = glitch_cap.read()
                 if not ret_glitch:
-                    glitch_cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                    glitch_cap.release()  # Release the glitch video capture
+                    glitch_cap = None  # Reset the glitch capture
+                    glitches[self.stream_id] = False
                     continue
 
                 glitch_frame = cv2.resize(glitch_frame, (frame.shape[1], frame.shape[0]))
@@ -73,7 +75,7 @@ class VideoStreamThread(threading.Thread):
             with self.lock:
                 self.latest_frame = buffer.tobytes()
 
-            time.sleep(1 / 60.0)  # Cap at 30 FPS
+            # time.sleep(1 / 60.0)  # Cap at 30 FPS
 
         cap.release()
         if glitch_cap:
@@ -87,6 +89,7 @@ class VideoStreamThread(threading.Thread):
 stream_threads = {n: VideoStreamThread(n) for n in videos}
 
 @app.route('/video')
+@app.route('/')
 def video_feed():
     n = request.args.get('n', '1')
     def generate():
