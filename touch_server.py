@@ -1,37 +1,55 @@
 import socket
-import threading
 import time
 import cv2
 import numpy as np
+from urllib.parse import urlparse, parse_qs
 
-# --- Frame fetcher (TouchDesigner fallback) ---
-def get_frame():
+# --- Frame fetcher ---
+def get_frame(n):
     try:
-        top = op('out')  # TouchDesigner TOP
-        frame = top.numpyArray()
-        frame = np.flip(frame, axis=2)
-        frame = (frame * 255).astype(np.uint8)
+        path = f'jpg_out/TDMovieOut.{n}.0.jpg'
+        frame = cv2.imread(path)
+        if frame is None:
+            raise Exception(f"Image not found: {path}")
+        _, jpeg = cv2.imencode('.jpg', frame)
     except:
-        frame = np.random.randint(0, 255, (240, 320, 3), dtype=np.uint8)
-        # frame = cv2.imread('1.png')
-        # print(1)
-    _, jpeg = cv2.imencode('.jpg', frame)
+        fallback = f'jpg_out/TDMovieOut.{n}.1.jpg'
+        frame = cv2.imread(fallback)
+        if frame is None:
+            print(f"Fallback image not found: {fallback}")
+            return b''
+        _, jpeg = cv2.imencode('.jpg', frame)
+
     return jpeg.tobytes()
 
 # --- MJPEG response handler ---
-def client_handler(conn):
+def handle_client(conn):
+    request = conn.recv(1024).decode()
+    try:
+        path = request.split(" ")[1]  # Extract URL from GET request
+        parsed = urlparse(path)
+        query = parse_qs(parsed.query)
+        n = int(query.get("n", ["0"])[0])
+    except:
+        n = 0  # Default to 0 if any error in parsing
+
+    print(f"Streaming for n={n}")
+
     conn.send(b"HTTP/1.1 200 OK\r\n")
     conn.send(b"Content-Type: multipart/x-mixed-replace; boundary=frame\r\n\r\n")
 
     try:
         while True:
-            frame = get_frame()
+            frame = get_frame(n)
+            if not frame:
+                break  # Stop if image load failed
+
             conn.send(b"--frame\r\n")
             conn.send(b"Content-Type: image/jpeg\r\n")
             conn.send(f"Content-Length: {len(frame)}\r\n\r\n".encode())
             conn.send(frame)
             conn.send(b"\r\n")
-            # time.sleep(1/30)
+            # time.sleep(1/30)  # Limit FPS if needed
     except:
         print("Client disconnected")
     finally:
@@ -47,6 +65,6 @@ def start_server():
     while True:
         conn, addr = s.accept()
         print(f"Connected: {addr}")
-        threading.Thread(target=client_handler, args=(conn,), daemon=True).start()
+        handle_client(conn)
 
 start_server()
