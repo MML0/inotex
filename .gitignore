@@ -1,2 +1,4 @@
 Backup/*
 ffmpeg-2025-04-14-git-3b2a9410ef-essentials_build/*
+hls_output/*
+dash_output/*

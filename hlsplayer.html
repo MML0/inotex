@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HLS Player</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #000;
+            overflow: hidden;
+        }
+        .player-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+    <div class="player-container">
+        <video id="video" muted></video>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.getElementById('video');
+            const videoSrc = 'hls_output/stream.m3u8';
+
+            if (Hls.isSupported()) {
+                const hls = new Hls({
+                    maxBufferLength: 30,
+                    maxMaxBufferLength: 600,
+                    maxBufferSize: 60 * 1000 * 1000,
+                    maxBufferHole: 0.5,
+                    lowLatencyMode: true,
+                    backBufferLength: 90,
+                    enableWorker: true,
+                    debug: false,
+                    // Increase the number of segments to load ahead
+                    maxFragLookUpTolerance: 0.25,
+                    // Reduce the frequency of manifest updates
+                    manifestLoadingTimeOut: 10000,
+                    manifestLoadingMaxRetry: 3,
+                    // Increase the buffer size for smoother playback
+                    startLevel: -1,
+                    abrEwmaDefaultEstimate: 500000,
+                    // Reduce the frequency of quality level changes
+                    abrEwmaFastLive: 3.0,
+                    abrEwmaSlowLive: 9.0,
+                    // Increase the buffer size for segments
+                    maxBufferHole: 0.5,
+                    highBufferWatchdogPeriod: 2
+                });
+
+                hls.loadSource(videoSrc);
+                hls.attachMedia(video);
+
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    video.play().catch(function(error) {
+                        console.log("Play failed:", error);
+                    });
+                });
+
+                // Error handling
+                hls.on(Hls.Events.ERROR, function(event, data) {
+                    if (data.fatal) {
+                        switch(data.type) {
+                            case Hls.ErrorTypes.NETWORK_ERROR:
+                                console.log("Network error, trying to recover...");
+                                hls.startLoad();
+                                break;
+                            case Hls.ErrorTypes.MEDIA_ERROR:
+                                console.log("Media error, trying to recover...");
+                                hls.recoverMediaError();
+                                break;
+                            default:
+                                console.log("Fatal error, stopping player");
+                                hls.destroy();
+                                break;
+                        }
+                    }
+                });
+            }
+            else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = videoSrc;
+                video.addEventListener('loadedmetadata', function() {
+                    video.play().catch(function(error) {
+                        console.log("Play failed:", error);
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
