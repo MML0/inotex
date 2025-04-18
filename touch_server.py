@@ -7,9 +7,9 @@ import threading
 
 # --- Frame fetcher ---
 def get_frame(n):
-    done = True
-    frame = np.random.randint(0, 255, (240, 720, 3), dtype=np.uint8)
-    _, jpeg = cv2.imencode('.jpg', frame)
+    done = 0
+    # frame = np.random.randint(0, 255, (450, 720, 3), dtype=np.uint8)
+    # _, jpeg = cv2.imencode('.jpg', frame)
     while not(done):
         try:
             path = f'jpg_out/TDMovieOut.{n}.0.0.jpg'
