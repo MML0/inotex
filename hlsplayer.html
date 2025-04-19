@@ -35,6 +35,18 @@
         <video id="video" muted></video>
     </div>
 
+    <img id="stream" style="display: none;">
+    <script>
+        // Get 'n' parameter from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const n = urlParams.get('n') || '2';  // Default to 2 if not specified
+        
+        // Set the image source with the correct 'n' parameter
+        const streamImg = document.getElementById('stream');
+        streamImg.src = `http://localhost:8080/?n=${n}`;
+    </script>
+
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const video = document.getElementById('video');

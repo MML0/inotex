@@ -1,81 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WebRTC Receiver</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HLS Player</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #000;
+            overflow: hidden;
+        }
+        .player-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+    </style>
 </head>
 <body>
-  <h1>!</h1>
-  
-  
- 
-  
-  <video id="remoteVideo" autoplay></video>
-  <script>
-    const ws = new WebSocket('ws://localhost:8080');
-    const pc = new RTCPeerConnection();
-
-    // Receive video stream
-    pc.ontrack = (event) => {
-      document.getElementById('remoteVideo').srcObject = event.streams[0];
-    };
-
-    // Handle WebSocket messages
-    ws.onmessage = async (event) => {
-      const data = JSON.parse(event.data);
-      if (data.sdp) {
-        await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
-        if (data.sdp.type === 'offer') {
-          const answer = await pc.createAnswer();
-          await pc.setLocalDescription(answer);
-          ws.send(JSON.stringify({ sdp: pc.localDescription }));
-        }
-      }
-    };
-  </script>
-  
-  
-  <video id="remoteVideo" autoplay playsinline></video>
-  <script>
-    // Replace with your local IP and port
-    const signalingServerUrl = 'wss://192.168.43.81:8080';
-    const pc = new RTCPeerConnection();
-    const remoteVideo = document.getElementById('remoteVideo');
-
-    // Handle incoming video stream
-    pc.ontrack = (event) => {
-      remoteVideo.srcObject = event.streams[0];
-    };
-
-    // Connect to the signaling server
-    const ws = new WebSocket(signalingServerUrl);
-    ws.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      if (message.type === 'offer') {
-        // Handle the offer from TouchDesigner
-        pc.setRemoteDescription(new RTCSessionDescription(message));
-        pc.createAnswer().then((answer) => {
-          return pc.setLocalDescription(answer);
-        }).then(() => {
-          ws.send(JSON.stringify({ type: 'answer', sdp: pc.localDescription }));
-        });
-      } else if (message.type === 'ice-candidate') {
-        // Handle ICE candidates
-        pc.addIceCandidate(new RTCIceCandidate(message.candidate));
-      }
-    };
-
-    // Send ICE candidates to the signaling server
-    pc.onicecandidate = (event) => {
-      if (event.candidate) {
-        ws.send(JSON.stringify({ type: 'ice-candidate', candidate: event.candidate }));
-      }
-    };
-  </script>
-  
-  
-  
-
+    <img class+"player-container" id="stream" style="display: none;">
+    <script>
+        // Get 'n' parameter from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const n = urlParams.get('n') || '0';  // Default to 2 if not specified
+        
+        // Set the image source with the correct 'n' parameter
+        const streamImg = document.getElementById('stream');
+        streamImg.src = `http://localhost:8080/?n=${n}`;
+    </script>
 </body>
 </html>
