@@ -31,7 +31,7 @@
     </style>
 </head>
 <body>
-    <img class+"player-container" id="stream" style="display: none;">
+    <img class+"player-container" id="stream" style="">
     <script>
         // Get 'n' parameter from URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -39,7 +39,7 @@
         
         // Set the image source with the correct 'n' parameter
         const streamImg = document.getElementById('stream');
-        streamImg.src = `http://localhost:8080/?n=${n}`;
+        streamImg.src = `http://localhost:8090/?n=${n}`;
     </script>
 </body>
 </html>

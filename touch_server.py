@@ -65,7 +65,7 @@ def handle_client(conn):
 # --- Start server ---
 def start_server():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(('0.0.0.0', 8080))
+    s.bind(('0.0.0.0', 8090))
     s.listen(5)
     print("Server listening on http://localhost:8080")
 
