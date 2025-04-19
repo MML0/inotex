@@ -36,3 +36,5 @@ env/
 
 # Misc
 .DS_Store
+switch_module/Backup/*
+LED_module/Backup/*

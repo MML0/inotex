@@ -13,7 +13,7 @@ print("Listening for UDP packets...")
 try:
     while True:
         # Receive data from ESP8266
-        data, addr = sock.recvfrom(10240)  # Buffer size: 1024 bytes
+        data, addr = sock.recvfrom(1024)  # Buffer size: 1024 bytes
         print(f"Received data from {addr}: {list(data)}")
 except KeyboardInterrupt:
     print("\nServer stopped.")
