@@ -23,7 +23,7 @@
             justify-content: center;
             align-items: center;
         }
-        video {
+        img {
             width: 100%;
             height: 100%;
             object-fit: contain;
@@ -31,15 +31,17 @@
     </style>
 </head>
 <body>
-    <img class+"player-container" id="stream" style="">
+    <div class="player-container">
+        <img id="stream" src="" alt="Loading stream...">
+    </div>
     <script>
         // Get 'n' parameter from URL
         const urlParams = new URLSearchParams(window.location.search);
-        const n = urlParams.get('n') || '0';  // Default to 2 if not specified
+        const n = urlParams.get('n') || '0';  // Default to 0 if not specified
         
         // Set the image source with the correct 'n' parameter
         const streamImg = document.getElementById('stream');
-        streamImg.src = `http://localhost:8090/?n=${n}`;
+        streamImg.src = `http://${location.hostname}:8090/?n=${n}`;
     </script>
 </body>
 </html>
