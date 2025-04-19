@@ -2,7 +2,7 @@
 #include <WiFiUdp.h>
 #include <FastLED.h>
 
-#define LED_PIN D1  // Pin connected to the data line of the WS2812B
+#define LED_PIN D2  // Pin connected to the data line of the WS2812B
 #define NUM_LEDS 1024  // Total number of LEDs in the strip
 #define LED_TYPE WS2812B
 #define COLOR_ORDER GRB
@@ -19,7 +19,7 @@ int lastShiftSpeed = 0;
 
 const char* ssid = "."; // Replace with your network SSID
 const char* password = "12345678an";           // Replace with your network password
-const IPAddress staticIP(192, 168, 43, 222);   // Static IP for the ESP8266
+const IPAddress staticIP(192, 168, 43, 117);   // Static IP for the ESP8266
 const IPAddress gateway(192, 168, 43, 1);      // Default gateway
 const IPAddress subnet(255, 255, 255, 0);      // Subnet mask
 
