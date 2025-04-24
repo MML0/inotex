@@ -19,7 +19,7 @@ int lastShiftSpeed = 0;
 
 const char* ssid = "."; // Replace with your network SSID
 const char* password = "12345678an";           // Replace with your network password
-const IPAddress staticIP(192, 168, 0, 103);   // Static IP for the ESP8266
+const IPAddress staticIP(192, 168, 0, 118);   // Static IP for the ESP8266
 const IPAddress gateway(192, 168, 0, 1);      // Default gateway
 const IPAddress subnet(255, 255, 255, 0);      // Subnet mask
 
