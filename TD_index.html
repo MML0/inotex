@@ -4,44 +4,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HLS Player</title>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         body {
             margin: 0;
             padding: 0;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            justify-content: flex-start;
             align-items: center;
             min-height: 100vh;
             background-color: #000;
-            overflow: hidden;
+        }
+        #fullscreen-button {
+            width: 100%;
+            height: 50px;
+            background-color: #444;
+            color: #fff;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
         }
         .player-container {
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: calc(100vh - 50px); /* Adjust for button height */
             display: flex;
             justify-content: center;
             align-items: center;
         }
         img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
+            width: auto;
+            max-width: 100%;
+            height: auto;
+            max-height: 100%;
+            transition: transform 0.3s ease-in-out;
+        }
+        .fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            background: #000;
         }
     </style>
 </head>
 <body>
+    <button id="fullscreen-button">Make Fullscreen</button>
     <div class="player-container">
         <img id="stream" src="" alt="Loading stream...">
     </div>
+
     <script>
         // Get 'n' parameter from URL
         const urlParams = new URLSearchParams(window.location.search);
-        const n = urlParams.get('n') || '0';  // Default to 0 if not specified
+        const n = urlParams.get('n') || '0'; // Default to 0 if not specified
         
         // Set the image source with the correct 'n' parameter
         const streamImg = document.getElementById('stream');
         streamImg.src = `http://${location.hostname}:8090/?n=${n}`;
+
+        // Function to check if the image is loaded properly
+        function checkStream() {
+            if (!streamImg.complete || streamImg.naturalWidth === 0) {
+                streamImg.src = `http://${location.hostname}:8090/?n=${n}`;
+            }
+        }
+
+        // Reload the image every 10 seconds
+        //setInterval(checkStream, 10000);
+
+        const fullscreenButton = document.getElementById('fullscreen-button');
+        let fullscreenTimeout;
+streamImg.classList.add('fullscreen');
+
+        // Fullscreen functionality
+        fullscreenButton.addEventListener('click', () => {
+            streamImg.classList.add('fullscreen');
+
+            // Reset fullscreen state after 30 seconds
+            //clearTimeout(fullscreenTimeout); // Ensure no duplicate timeouts
+            //fullscreenTimeout = setTimeout(() => {
+              //  streamImg.classList.remove('fullscreen');
+            //}, 30000);
+        });
     </script>
 </body>
 </html>
