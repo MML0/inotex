@@ -6,11 +6,52 @@
   <style>
     body {
       margin: 0;
+      background-color: black;
     }
     video {
       width: 100%;
       height: auto;
       display: block;
+      object-fit: cover;
+    }
+    video::-webkit-media-controls {
+      display: none !important;
+    }
+    video::-webkit-media-controls-enclosure {
+      display: none !important;
+    }
+    video::-webkit-media-controls-panel {
+      display: none !important;
+    }
+    video::-webkit-media-controls-play-button {
+      display: none !important;
+    }
+    video::-webkit-media-controls-timeline {
+      display: none !important;
+    }
+    video::-webkit-media-controls-current-time-display {
+      display: none !important;
+    }
+    video::-webkit-media-controls-time-remaining-display {
+      display: none !important;
+    }
+    video::-webkit-media-controls-timeline-container {
+      display: none !important;
+    }
+    video::-webkit-media-controls-volume-slider-container {
+      display: none !important;
+    }
+    video::-webkit-media-controls-volume-slider {
+      display: none !important;
+    }
+    video::-webkit-media-controls-mute-button {
+      display: none !important;
+    }
+    video::-webkit-media-controls-toggle-closed-captions-button {
+      display: none !important;
+    }
+    video::-webkit-media-controls-fullscreen-button {
+      display: none !important;
     }
     .fullscreen-btn {
       position: absolute;
@@ -59,57 +100,82 @@
     const urlParams = new URLSearchParams(window.location.search);
     const clientId = urlParams.get('n') || '0';
 
-    // Connect to WebSocket server
-    const socket = new WebSocket("ws://" + location.hostname + ":3000");
+    let socket = null;
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 100000; // Maximum number of reconnection attempts
+    const reconnectInterval = 5000; // 5 seconds
+
+    function connectWebSocket() {
+        if (socket) {
+            socket.close();
+        }
+
+        socket = new WebSocket("ws://" + location.hostname + ":3000");
+
+        socket.onopen = () => {
+            console.log("WebSocket connected as ID:", clientId);
+            socket.send(JSON.stringify({ type: "hello", id: clientId }));
+            resetRestartTimer(); // start on connect
+            reconnectAttempts = 0; // Reset reconnection attempts on successful connection
+        };
+
+        socket.onmessage = (event) => {
+            try {
+                const msg = JSON.parse(event.data);
+                console.log(msg);
+                
+                // Only act if the message is meant for this client ID or for all
+                if (msg.id && msg.id !== clientId && msg.id !== "all") return;
+
+                if (msg.action === "pause") {
+                    video.pause();
+                } else if (msg.action === "play") {
+                    video.play();
+                } else if (msg.action === "restart") {
+                    video.currentTime = 0;
+                    video.play();
+                    resetRestartTimer();
+                } else if (msg.action === "url" && msg.url) {
+                    video.src = msg.url;
+                    video.load();
+                    video.play();
+                    resetRestartTimer();
+                }
+            } catch (err) {
+                console.error("Invalid WebSocket message:", err);
+            }
+        };
+
+        socket.onerror = (err) => {
+            console.error("WebSocket error:", err);
+        };
+
+        socket.onclose = (event) => {
+            console.log("WebSocket closed:", event.code, event.reason);
+            if (reconnectAttempts < maxReconnectAttempts) {
+                reconnectAttempts++;
+                console.log(`Attempting to reconnect (${reconnectAttempts}/${maxReconnectAttempts})...`);
+                setTimeout(connectWebSocket, reconnectInterval);
+            } else {
+                console.error("Max reconnection attempts reached. Please refresh the page.");
+            }
+        };
+    }
+
+    // Initial connection
+    connectWebSocket();
 
     let restartTimeout;
     const restartTimeoutDuration = 60000; // 60 seconds
 
     function resetRestartTimer() {
-      clearTimeout(restartTimeout);
-      restartTimeout = setTimeout(() => {
-        console.warn("No restart command received. Auto-restarting...");
-        video.currentTime = 0;
-        video.play();
-      }, restartTimeoutDuration);
+        clearTimeout(restartTimeout);
+        restartTimeout = setTimeout(() => {
+            console.warn("No restart command received. Auto-restarting...");
+            video.currentTime = 0;
+            video.play();
+        }, restartTimeoutDuration);
     }
-
-    socket.onopen = () => {
-      console.log("WebSocket connected as ID:", clientId);
-      socket.send(JSON.stringify({ type: "hello", id: clientId }));
-      resetRestartTimer(); // start on connect
-    };
-
-    socket.onmessage = (event) => {
-      try {
-        const msg = JSON.parse(event.data);
-        console.log(msg);
-        
-        // Only act if the message is meant for this client ID or for all
-        if (msg.id && msg.id !== clientId && msg.id !== "all") return;
-
-        if (msg.action === "pause") {
-          video.pause();
-        } else if (msg.action === "play") {
-          video.play();
-        } else if (msg.action === "restart") {
-          video.currentTime = 0;
-          video.play();
-          resetRestartTimer();
-        } else if (msg.action === "url" && msg.url) {
-          video.src = msg.url;
-          video.load();
-          video.play();
-          resetRestartTimer();
-        }
-      } catch (err) {
-        console.error("Invalid WebSocket message:", err);
-      }
-    };
-
-    socket.onerror = (err) => {
-      console.error("WebSocket error:", err);
-    };
   </script>
 
 </body>
