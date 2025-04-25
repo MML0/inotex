@@ -25,7 +25,7 @@ uint8_t previousStates[numDigitalPins]; // Buffer to store previous states of pi
 
 // Timing
 unsigned long lastSendTime = 0; // Stores the last time data was sent
-const unsigned long sendInterval = 50; // Minimum interval for sending data (in milliseconds)
+const unsigned long sendInterval = 5; // Minimum interval for sending data (in milliseconds)
 
 // Function to connect to Wi-Fi
 void connectToWiFi() {

@@ -35,7 +35,7 @@ def whileOn(channel, sampleIndex, val, prev):
             table = op('keys')
             row_name = 'k{}'.format(i + 1) + str(ip.split('.')[-1])
         
-             if table.row(row_name) is None:
+            if table.row(row_name) is None:
                 table.appendRow([row_name, '0'])
         
             table[row_name, 1] = value
