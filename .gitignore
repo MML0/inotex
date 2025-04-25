@@ -38,3 +38,4 @@ env/
 .DS_Store
 switch_module/Backup/*
 LED_module/Backup/*
+*.rar

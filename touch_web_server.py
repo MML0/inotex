@@ -11,6 +11,7 @@
 # 		'statusCode' - A valid HTTP status code integer (ie. 200, 401, 404). Default is 404.
 # 		'statusReason' - The reason for the above status code being returned (ie. 'Not Found.').
 # 		'data' - The data to send back to the client. If displaying a web-page, any HTML would be put here.
+import json
 
 # return the response dictionary
 def onHTTPRequest(webServerDAT, request, response):
@@ -27,6 +28,7 @@ def onHTTPRequest(webServerDAT, request, response):
         '17': 'http://192.168.0.12/inotex/6.mp4',
         '88': 'http://192.168.0.12/inotex/7.mp4',
         '9': 'http://192.168.0.12/inotex/8.mp4',
+        '999': 'http://localhost/inotex/8.mp4',
     }
 
     selected_url = rout_dic.get(str(n), 'http://192.168.0.12/inotex/1.mp4')
@@ -38,11 +40,48 @@ def onHTTPRequest(webServerDAT, request, response):
 
     return response
 
-def onWebSocketOpen(webServerDAT, client, uri):
+clients = []
+
+def updateClientTable():
+    table = op('clientList')
+    table.clear()
+    table.appendRow(['id', 'client'])
+    for i, c in enumerate(clients):
+        table.appendRow([str(i), str(c)])
+
+# def onWebSocketOpen(webServerDAT, client):
+#     clients.append(client)
+#     updateClientTable()
+#     return
+
+# def onWebSocketClose(webServerDAT, client):
+#     if client in clients:
+#         clients.remove(client)
+#     updateClientTable()
+#     return
+
+
+def onWebSocketOpen(webServerDAT, client):
+	clients_table = op('clientList')
+	if clients_table is not None:
+		clients_table.appendRow([client])
 	return
 
 def onWebSocketClose(webServerDAT, client):
+	clients_table = op('clientList')
+	if clients_table is not None:
+		for i in range(1, clients_table.numRows):  # skip header
+			if clients_table[i, 0].val == str(client):
+				clients_table.deleteRow(i)
+				break
 	return
+# def onWebSocketOpen(webServerDAT, client):
+#     # webServerDAT.webSocketSendText(client, "Welcome to the server!")
+# 	return
+
+
+# def onWebSocketClose(webServerDAT, client):
+# 	return
 
 def onWebSocketReceiveText(webServerDAT, client, data):
 	webServerDAT.webSocketSendText(client, data)
@@ -58,6 +97,18 @@ def onWebSocketReceivePing(webServerDAT, client, data):
 
 def onWebSocketReceivePong(webServerDAT, client, data):
 	return
+
+def sendUrlToAll(url):
+    """Send a URL command to all connected WebSocket clients"""
+    message = json.dumps({
+        "action": "url",
+        "url": url,
+        "id": "all"
+    })
+    webServerDAT = op('webServer')
+    if webServerDAT is not None:
+        for client in webServerDAT.websocketClients:
+            webServerDAT.webSocketSendText(client, message)
 
 def onServerStart(webServerDAT):
 	return
