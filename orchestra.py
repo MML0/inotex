@@ -69,6 +69,7 @@ def onPlayStateChange(state):
     return
 
 def onDeviceChange():
+    send_url_command_to_clients(url="http://192.168.0.12/inotex/2.mp4", target_id="all")
     return
 
 def onProjectPreSave():

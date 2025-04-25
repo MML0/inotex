@@ -99,6 +99,19 @@
     // Get ?n= parameter from URL
     const urlParams = new URLSearchParams(window.location.search);
     const clientId = urlParams.get('n') || '0';
+    
+    // Create and add the h1 element
+    const h1 = document.createElement('h1');
+    h1.textContent = `Client ${clientId}`;
+    h1.style.position = 'absolute';
+    h1.style.top = '50%';
+    h1.style.left = '50%';
+    h1.style.transform = 'translate(-50%, -50%)';
+    h1.style.color = 'white';
+    h1.style.fontSize = '48px';
+    h1.style.textShadow = '2px 2px 4px rgba(0,0,0,0.5)';
+    h1.style.zIndex = '20';
+    document.body.appendChild(h1);
 
     let socket = null;
     let reconnectAttempts = 0;
@@ -115,7 +128,7 @@
         socket.onopen = () => {
             console.log("WebSocket connected as ID:", clientId);
             socket.send(JSON.stringify({ type: "hello", id: clientId }));
-            resetRestartTimer(); // start on connect
+             // start on connect
             reconnectAttempts = 0; // Reset reconnection attempts on successful connection
         };
 
@@ -134,12 +147,16 @@
                 } else if (msg.action === "restart") {
                     video.currentTime = 0;
                     video.play();
-                    resetRestartTimer();
+                    
                 } else if (msg.action === "url" && msg.url) {
                     video.src = msg.url;
                     video.load();
                     video.play();
-                    resetRestartTimer();
+                    setTimeout(()=>{
+                        video.load();
+                        video.play();
+                    },100)
+                    
                 }
             } catch (err) {
                 console.error("Invalid WebSocket message:", err);
@@ -165,17 +182,7 @@
     // Initial connection
     connectWebSocket();
 
-    let restartTimeout;
-    const restartTimeoutDuration = 60000; // 60 seconds
 
-    function resetRestartTimer() {
-        clearTimeout(restartTimeout);
-        restartTimeout = setTimeout(() => {
-            console.warn("No restart command received. Auto-restarting...");
-            video.currentTime = 0;
-            video.play();
-        }, restartTimeoutDuration);
-    }
   </script>
 
 </body>
