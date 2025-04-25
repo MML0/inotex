@@ -98,17 +98,6 @@ def onWebSocketReceivePing(webServerDAT, client, data):
 def onWebSocketReceivePong(webServerDAT, client, data):
 	return
 
-def sendUrlToAll(url):
-    """Send a URL command to all connected WebSocket clients"""
-    message = json.dumps({
-        "action": "url",
-        "url": url,
-        "id": "all"
-    })
-    webServerDAT = op('webServer')
-    if webServerDAT is not None:
-        for client in webServerDAT.websocketClients:
-            webServerDAT.webSocketSendText(client, message)
 
 def onServerStart(webServerDAT):
 	return

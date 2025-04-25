@@ -28,6 +28,20 @@ def send_command_to_clients(command, target_id="all"):
             message = json.dumps({"type": "command", "id": target_id, "action": command})
             webServerDAT.webSocketSendText(client_id, message)
 
+def send_url_command_to_clients(url, target_id="all"):
+    if clientsTable is None:
+        debug('clients_table DAT not found.')
+        return
+
+    for i in range(1, clientsTable.numRows):  # skip header
+        client_id = clientsTable[i, 0].val
+        if target_id == "all" :
+            message = json.dumps({"action": "url", "url": url, "id": "all"})
+            webServerDAT.webSocketSendText(client_id, message)
+        else:
+            message = json.dumps({"action": "url", "url": url, "id": target_id})
+            webServerDAT.webSocketSendText(client_id, message)
+
 def onCreate():
     send_command_to_clients("play")  # Example: Send 'play' command to all clients
 
@@ -51,6 +65,7 @@ def onFrameEnd(frame):
     return
 
 def onPlayStateChange(state):
+    send_url_command_to_clients(url="http://192.168.0.12/inotex/1.mp4", target_id="all")
     return
 
 def onDeviceChange():
