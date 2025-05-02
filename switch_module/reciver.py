@@ -2,7 +2,7 @@ import socket
 import time
 
 # Network Configuration
-UDP_IP = "192.168.43.81"  # The IP address of this computer
+UDP_IP = "192.168.0.12"  # The IP address of this computer
 UDP_PORT = 4210          # Same port as configured in the ESP8266
 
 def main():
@@ -16,8 +16,10 @@ def main():
         while True:
             try:
                 # Receive data
-                data, addr = sock.recvfrom(1024)
-                
+                data, addr = sock.recvfrom(102400000)
+                # print("\n\n")
+                if data:
+                    print((data,addr))
                 if len(data) == 9:  # 8 switch states + 1 info byte
                     # Extract switch states
                     switch_states = list(data[:8])

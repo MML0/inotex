@@ -47,9 +47,10 @@ def onCreate():
 
 
 def onStart():
-    # Send to the first client (optional)
-    if callbacks.clients:
-        webServerDAT.webSocketSendText(callbacks.clients[0], 'Hello, first client!')
+    send_command_to_clients("restart", target_id="88") 
+    send_command_to_clients("restart", target_id="6") 
+    send_command_to_clients("restart", target_id="19")
+    send_command_to_clients("restart", target_id="17") 
     return
 
 def onExit():
@@ -61,18 +62,31 @@ def onFrameStart(frame):
     return
 
 def onFrameEnd(frame):
-    send_command_to_clients("restart")  # Example: Send 'play' command to all clients
+    # send_command_to_clients("restart", target_id="88") 
+    # send_command_to_clients("restart", target_id="6") 
+    # send_command_to_clients("restart", target_id="19")
+    # send_command_to_clients("restart", target_id="17") 
+    send_command_to_clients("restart", target_id="5") # bala chap
+    send_command_to_clients("restart", target_id="2") 
+    send_command_to_clients("restart", target_id="9") 
+    send_command_to_clients("restart", target_id="3") 
+
     return
 
 def onPlayStateChange(state):
-    send_url_command_to_clients(url="http://192.168.0.12/inotex/1.mp4", target_id="all")
+    send_url_command_to_clients(url="http://192.168.0.12/inotex/n19.mp4", target_id="19")
     return
 
 def onDeviceChange():
-    send_url_command_to_clients(url="http://192.168.0.12/inotex/2.mp4", target_id="all")
+    send_url_command_to_clients(url="http://192.168.0.12/inotex/n23.mp4", target_id="3")
     return
 
 def onProjectPreSave():
+    # reset resync url
+    # send_url_command_to_clients(url="http://192.168.0.12/inotex/n5.mp4", target_id="5") 
+    # send_url_command_to_clients(url="http://192.168.0.12/inotex/n2.mp4", target_id="2") 
+    # send_url_command_to_clients(url="http://192.168.0.12/inotex/n9.mp4", target_id="9") 
+    # send_url_command_to_clients(url="http://192.168.0.12/inotex/n23.mp4", target_id="3") 
     return
 
 def onProjectPostSave():

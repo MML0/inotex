@@ -22,12 +22,14 @@ def onHTTPRequest(webServerDAT, request, response):
     rout_dic = {
         '0': 'http://192.168.0.12/inotex/1.mp4',
         '1': 'http://192.168.0.12/inotex/2.mp4',
-        '2': 'http://192.168.0.12/inotex/3.mp4',
-        '3': 'http://192.168.0.12/inotex/4.mp4',
-        '19': 'http://192.168.0.12/inotex/5.mp4',
-        '17': 'http://192.168.0.12/inotex/6.mp4',
-        '88': 'http://192.168.0.12/inotex/7.mp4',
-        '9': 'http://192.168.0.12/inotex/8.mp4',
+        '2': 'http://192.168.0.12/inotex/n2.mp4',
+        '5': 'http://192.168.0.12/inotex/n5.mp4',
+        '6': 'http://192.168.0.12/inotex/n6.mp4',
+        '9': 'http://192.168.0.12/inotex/n9.mp4',
+        '19': 'http://192.168.0.12/inotex/n19.mp4',
+        '17': 'http://192.168.0.12/inotex/n17.mp4',
+        '3': 'http://192.168.0.12/inotex/n23.mp4',
+        '88': 'http://192.168.0.12/inotex/n88.mp4',
         '999': 'http://localhost/inotex/8.mp4',
     }
 
